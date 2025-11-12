@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dish Craft - Recipe App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f0e8;
+            color: #4a3828;
+        }
+
+        /* Navigation */
+        nav {
+            background: linear-gradient(135deg, #ff8b7b 0%, #e9776a 100%);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 2.5rem;
+            color: white;
+            font-style: italic;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn:hover {
+            background: white;
+            color: #ff8b7b;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .nav-btn:active {
+            transform: translateY(-1px) scale(0.95);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: #ff8b7b;
+        }
+
+        /* Bubble effect */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+            pointer-events: none;
+            animation: bubble-pop 0.6s ease-out;
+        }
+
+        @keyframes bubble-pop {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card with checkered border */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: 
+                repeating-linear-gradient(45deg, 
+                    #ffb8ae 0px, 
+                    #ffb8ae 20px, 
+                    transparent 20px, 
+                    transparent 40px),
+                repeating-linear-gradient(-45deg, 
+                    #ffb8ae 0px, 
+                    #ffb8ae 20px, 
+                    transparent 20px, 
+                    transparent 40px);
+            border-radius: 25px;
+            z-index: -1;
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            background: linear-gradient(135deg, #f5f0e8 0%, #ffe8dc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .splash-logo {
+            text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .splash-logo img {
+            max-width: 300px;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4a3828;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid #e0d5c7;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #ff8b7b;
+            box-shadow: 0 0 0 3px rgba(255,139,123,0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8bc34a 0%, #7cb342 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139,195,74,0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139,195,74,0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff8b7b 0%, #e9776a 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255,139,123,0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,139,123,0.4);
+        }
+
+        /* Ingredient Tags */
+        .ingredient-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.3rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .ingredient-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46,125,50,0.2);
+        }
+
+        .remove-tag {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-tag:hover {
+            transform: rotate(90deg) scale(1.2);
+        }
+
+        /* Recipe Cards */
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            position: relative;
+        }
+
+        .recipe-tags {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .recipe-tag-small {
+            background: rgba(255,255,255,0.95);
+            padding: 0.3rem 0.7rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .recipe-content {
+            padding: 1.2rem;
+        }
+
+        .recipe-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #4a3828;
+        }
+
+        .recipe-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #8d7a6a;
+            font-size: 0.9rem;
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.3) rotate(12deg);
+        }
+
+        /* Search Input */
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1.2rem 3rem 1.2rem 1.5rem;
+            border: 3px solid #ff8b7b;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 5px rgba(255,139,123,0.2);
+            transform: translateY(-2px);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ff8b7b;
+            font-size: 1.5rem;
+        }
+
+        /* Upload Photo */
+        .upload-box {
+            border: 3px dashed #ccc;
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .upload-box:hover {
+            border-color: #ff8b7b;
+            background: #fff5f3;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #6d4c41;
+            margin-bottom: 1rem;
+        }
+
+        /* Page titles */
+        h1, h2 {
+            text-align: center;
+            color: #4a3828;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        /* Profile page */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .account-settings {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        /* Loading indicator */
+        .loading {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+
+        .loading-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Filter buttons */
+        .filter-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.7rem 1.5rem;
+            border: 2px solid #8bc34a;
+            background: white;
+            color: #4a3828;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-weight: 600;
+        }
+
+        .filter-btn:hover {
+            background: #8bc34a;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .filter-btn.active {
+            background: #8bc34a;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recipe-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="page active">
+        <div class="splash-logo">
+            <div style="background: linear-gradient(135deg, #ffcc80 0%, #ffa726 100%); 
+                        width: 300px; height: 300px; border-radius: 50%; 
+                        display: flex; align-items: center; justify-content: center;
+                        position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.2);">
+                <div style="position: relative;">
+                    <div style="background: linear-gradient(135deg, #ffebee 0%, #fff3e0 100%); 
+                                width: 220px; height: 220px; 
+                                border-radius: 50% 50% 0 50%; 
+                                display: flex; align-items: center; justify-content: center;
+                                position: relative;">
+                        <div style="font-size: 80px;">🍳</div>
+                        <div style="position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 30px;">❤️</div>
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <div style="font-size: 2.5rem; font-weight: bold; color: #ff6f00; font-family: 'Comic Sans MS', cursive;">DishKraft</div>
+                        <div style="font-size: 0.9rem; color: #d84315; margin-top: 0.5rem;">Powered by ingredients.<br>Perfected by DishKraft</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="main-nav" style="display: none;">
+        <div class="nav-content">
+            <div class="logo">Dish Craft</div>
+            <div class="nav-links">
+                <button class="nav-btn" onclick="showPage('search')">Search Recipes</button>
+                <button class="nav-btn" onclick="showPage('my-recipes')">My Recipes</button>
+                <button class="nav-btn" onclick="showPage('ai-chef')">AI Chef</button>
+                <button class="nav-btn" onclick="showPage('profile')">Profile</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Login Page -->
+        <div id="login-page" class="page" style="display: none;">
+            <div class="card" style="max-width: 500px; margin: 4rem auto;">
+                <h1>Welcome Back</h1>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" placeholder="Chef.JohnDoe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="johef.JohnDoe" value="johef.JohnDoe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" placeholder="Password" value="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Log In</button>
+                </form>
+                <p style="text-align: center; margin-top: 1.5rem;">
+                    <a href="#" onclick="showPage('register'); return false;" style="color: #4a9aff; text-decoration: underline;">Don't have your account? Register</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="register-page" class="page">
+            <div class="card" style="max-width: 500px; margin: 4rem auto;">
+                <h1>Join the Picnic!</h1>
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" placeholder="Chef.JohnDoe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="johef.JohnDoe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+                </form>
+                <p style="text-align: center; margin-top: 1.5rem;">
+                    <a href="#" onclick="showPage('login'); return false;" style="color: #4a9aff; text-decoration: underline;">Already have your account? Log In</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Search Recipes Page -->
+        <div id="search-page" class="page">
+            <div class="card">
+                <h1>What's in your pantry?</h1>
+                <div class="search-container">
+                    <input type="text" id="ingredient-search" class="search-input" placeholder="Type ingredients..." onkeypress="handleIngredientAdd(event)">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div id="ingredient-container" style="margin-bottom: 2rem;">
+                    <div class="ingredient-tag">
+                        🍗 Chicken
+                        <button class="remove-tag" onclick="removeIngredient(this)">×</button>
+                    </div>
+                    <div class="ingredient-tag">
+                        🥬 Spinach
+                        <button class="remove-tag" onclick="removeIngredient(this)">×</button>
+                    </div>
+                    <div class="ingredient-tag">
+                        🧀 Feta Cheese
+                        <button class="remove-tag" onclick="removeIngredient(this)">×</button>
+                    </div>
+                </div>
+                <div id="suggestions" style="margin-bottom: 2rem; background: #f9f9f9; padding: 1rem; border-radius: 12px;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Suggestions:</div>
+                    <div class="ingredient-tag" onclick="addSuggestion('chicken breast')">
+                        🍗 chicken breast
+                        <span style="color: #8bc34a;">+</span>
+                    </div>
+                    <div class="ingredient-tag" onclick="addSuggestion('bell pepper')">
+                        🫑 bell pepper
+                        <span style="color: #8bc34a;">+</span>
+                    </div>
+                    <div class="ingredient-tag" onclick="addSuggestion('onion')">
+                        🧅 onion
+                        <span style="color: #8bc34a;">+</span>
+                    </div>
+                    <div class="ingredient-tag" onclick="addSuggestion('tomato')">
+                        🍅 tomato
+                        <span style="color: #8bc34a;">+</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="display: block; margin: 0 auto;" onclick="searchRecipes()">🔍 Find Recipes</button>
+            </div>
+
+            <div id="search-results" style="display: none; margin-top: 2rem;">
+                <h2>Recipes using: Chicken, Spinach, Feta Cheese</h2>
+                <div class="filter-container">
+                    <button class="filter-btn active">Cuisine</button>
+                    <button class="filter-btn">Dietary Type</button>
+                    <button class="filter-btn">🍃 Dietary Type</button>
+                    <button class="filter-btn">⏱️ Cooking Time</button>
+                </div>
+                <h3 style="margin-bottom: 1rem;">Exact Matches</h3>
+                <div class="recipe-grid" id="recipe-grid"></div>
+            </div>
+        </div>
+
+        <!-- My Recipes Page -->
+        <div id="my-recipes-page" class="page">
+            <h1>My Saved Recipes</h1>
+            <div class="filter-container">
+                <button class="filter-btn active">Cuisine</button>
+                <button class="filter-btn">Dietary Type</button>
+                <button class="filter-btn">🍃 Dietary Type</button>
+                <button class="filter-btn">⏱️ Cooking Time</button>
+            </div>
+            <div class="recipe-grid" id="saved-recipes-grid"></div>
+        </div>
+
+        <!-- AI Chef Page -->
+        <div id="ai-chef-page" class="page">
+            <div class="card">
+                <h1>AI Recipe Generator</h1>
+                <div class="form-group">
+                    <label>Ingredients</label>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                        <div class="ingredient-tag" style="background: #ffebee; color: #c62828;">
+                            🥜 Peanut Butter
+                            <button class="remove-tag">×</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cuisine</label>
+                    <select>
+                        <option>✅ Broccoli</option>
+                        <option>Italian</option>
+                        <option>Mexican</option>
+                        <option>Thai</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cuisine Type</label>
+                    <select>
+                        <option>Thai</option>
+                        <option>Mild</option>
+                        <option>Spicy</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Difficulty</label>
+                    <input type="range" min="1" max="5" value="3" style="width: 100%;">
+                </div>
+                <button class="btn btn-primary" style="display: block; margin: 2rem auto;" onclick="generateRecipe()">Generate Recipe</button>
+
+                <div id="generated-recipe" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #eee;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500" style="width: 100%; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+                        </div>
+                        <div>
+                            <h2 style="text-align: left;">Spicy Thai Peanut Tofu Bowl</h2>
+                            <div style="margin: 1rem 0;">
+                                <span class="ingredient-tag" style="margin: 0.2rem;">✅ Ingredients</span>
+                                <span class="ingredient-tag" style="margin: 0.2rem;">✅ Broches</span>
+                                <span class="ingredient-tag" style="margin: 0.2rem;">✅ Polliceath</span>
+                                <span class="ingredient-tag" style="margin: 0.2rem;">✅ Peanut Butter</span>
+                            </div>
+                            <div style="margin: 1rem 0;">
+                                <span class="ingredient-tag" style="background: #fff3e0; color: #e65100; margin: 0.2rem;">Turd fisk</span>
+                                <span class="ingredient-tag" style="background: #fff3e0; color: #e65100; margin: 0.2rem;">Missing Chicken</span>
+                                <span class="ingredient-tag" style="background: #fff3e0; color: #e65100; margin: 0.2rem;">Suller</span>
+                            </div>
+                            <div style="margin-top: 2rem;">
+                                <button class="btn btn-primary" onclick="alert('Recipe saved!')">Save to My Recipes</button>
+                                <button class="btn btn-secondary" onclick="generateRecipe()">Regenerate Recipe</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile-page" class="page">
+            <h1>Profile</h1>
+            <div class="profile-grid">
+                <div class="account-settings">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div style="width: 80px; height: 80px; background: #ff8b7b; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            👨‍🍳
+                        </div>
+                        <h3>Account Settings</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>Username:</label>
+                        <input type="text" value="Chef.JohnDoe" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" value="john.doe@email.com" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" value="••••••••" readonly>
+                    </div>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 1rem;">🛠️ Edit Profile</button>
+                    <button class="btn" style="width: 100%; background: #f44336; color: white; margin-bottom: 1rem;">Change Password</button>
+                    <button class="btn" style="width: 100%; background: #8bc34a; color: white; margin-bottom: 1rem;" onclick="showPage('submit-recipe')">My Submitted Recipes</button>
+                    <button class="btn" style="width: 100%; background: #9e9e9e; color: white;" onclick="logout()">Logout</button>
+                </div>
+                <div>
+                    <h2 style="text-align: left;">My Saved Recipes</h2>
+                    <div class="recipe-grid" id="profile-recipes-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Recipe Page -->
+        <div id="submit-recipe-page" class="page">
+            <div class="card">
+                <h1>Submit Your Own Recipe</h1>
+                <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+                    <div>
+                        <div class="form-group">
+                            <label>Instructions:</label>
+                            <textarea rows="3" placeholder="Step 1..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Instructions:</label>
+                            <textarea rows="3" placeholder="Step 2..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Ingredients</label>
+                            <div id="submit-ingredients">
+                                <div class="ingredient-tag">
+                                    🥬 Spinach
+                                    <button class="remove-tag">×</button>
+                                </div>
+                            </div>
+                            <input type="text" placeholder="Add ingredient..." style="margin-top: 1rem;">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="upload-box" onclick="document.getElementById('file-upload').click()">
+                            <div class="upload-icon">📷</div>
+                            <div style="font-weight: 600; color: #4a3828;">Upload Photo</div>
+                            <input type="file" id="file-upload" style="display: none;" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="display: block; margin: 2rem auto;" onclick="saveRecipe()">Save Recipe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="loading-icon">⏳</div>
+        <span>Please wait.....your recipes are loading!</span>
+    </div>
+
+    <script>
+        // Bubble effect for buttons
+        document.querySelectorAll('.nav-btn, .btn, .filter-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const bubble = document.createElement('span');
+                bubble.classList.add('bubble');
+                
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                bubble.style.width = bubble.style.height = size + 'px';
+                bubble.style.left = e.clientX - rect.left - size/2 + 'px';
+                bubble.style.top = e.clientY - rect.top - size/2 + 'px';
+                
+                this.appendChild(bubble);
+                
+                setTimeout(() => bubble.remove(), 600);
+            });
+        });
+
+        // Splash screen
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.display = 'none';
+            document.getElementById('register-page').classList.add('active');
+            document.getElementById('main-nav').style.display = 'block';
+        }, 2500);
+
+        // Page navigation
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const pageMap = {
+                'search': 'search-page',
+                'my-recipes': 'my-recipes-page',
+                'ai-chef': 'ai-chef-page',
+                'profile': 'profile-page',
+                'login': 'login-page',
+                'register': 'register-page',
+                'submit-recipe': 'submit-recipe-page'
+            };
+
+            const pageId = pageMap[pageName];
+            const pageElement = document.getElementById(pageId);
+            if (pageElement) {
+                pageElement.classList.add('active');
+                
+                // Update active nav button
+                const navButtons = document.querySelectorAll('.nav-btn');
+                navButtons.forEach(btn => {
+                    if (btn.textContent.toLowerCase().includes(pageName.replace('-', ' '))) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Sample recipes data
+        const recipes = [
+            {
+                title: 'Greek Chicken Salad',
+                image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
+                time: '8 min',
+                tags: ['Broccoli', 'Tofu'],
+                favorite: true
+            },
+            {
+                title: 'Greek Chicken Salad Bowl',
+                image: 'https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=400',
+                time: '20 min',
+                tags: ['Broccoli'],
+                favorite: false
+            },
+            {
+                title: 'Lemon Herb Roasted Roasted Chicken',
+                image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400',
+                time: '7 min',
+                tags: ['Broccoli', 'Tofu'],
+                favorite: false
+            },
+            {
+                title: 'Lemon Herb Roasted Chicken',
+                image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400',
+                time: '8 min',
+                tags: ['Broccoli', 'Tofu'],
+                favorite: true
+            },
+            {
+                title: 'Spick Chicken Salad',
+                image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400',
+                time: '3 min',
+                tags: ['Broccoli'],
+                favorite: true
+            },
+            {
+                title: 'Spicy Thai Peanut Tofu Bowl',
+                image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
+                time: '8 min',
+                tags: ['Broccoli', 'Tofu'],
+                favorite: true
+            },
+            {
+                title: 'Greek Chicken Pasta',
+                image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400',
+                time: '20 min',
+                tags: [],
+                favorite: false
+            },
+            {
+                title: 'Creamy Feta Pasta with Chicken',
+                image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400',
+                time: '20 min',
+                tags: [],
+                favorite: false
+            }
+        ];
+
+        // Render recipes
+        function renderRecipes(containerId, recipesData) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            recipesData.forEach((recipe, index) => {
+                const card = document.createElement('div');
+                card.className = 'recipe-card';
+                card.onclick = () => viewRecipe(recipe);
+                
+                const tagsHTML = recipe.tags.map(tag => 
+                    `<span class="recipe-tag-small">${tag}</span>`
+                ).join('');
+                
+                card.innerHTML = `
+                    <div style="position: relative;">
+                        <img src="${recipe.image}" class="recipe-image" alt="${recipe.title}">
+                        <div class="recipe-tags">${tagsHTML}</div>
+                        <button class="favorite-btn" style="position: absolute; top: 10px; right: 10px; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation(); toggleFavorite(${index})">
+                            ${recipe.favorite ? '❤️' : '🤍'}
+                        </button>
+                    </div>
+                    <div class="recipe-content">
+                        <div class="recipe-title">${recipe.title}</div>
+                        <div class="recipe-meta">
+                            <span>⭐⭐⭐⭐⭐</span>
+                            <span>💚 ${recipe.time}</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize recipes on page load
+        setTimeout(() => {
+            renderRecipes('saved-recipes-grid', recipes);
+            renderRecipes('profile-recipes-grid', recipes.slice(0, 4));
+        }, 100);
+
+        // Search recipes
+        function searchRecipes() {
+            document.getElementById('loading').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('search-results').style.display = 'block';
+                renderRecipes('recipe-grid', recipes);
+                window.scrollTo({ top: document.getElementById('search-results').offsetTop - 100, behavior: 'smooth' });
+            }, 2000);
+        }
+
+        // View recipe details
+        function viewRecipe(recipe) {
+            alert(`Viewing: ${recipe.title}\n\nThis would open a detailed recipe view!`);
+        }
+
+        // Toggle favorite
+        function toggleFavorite(index) {
+            recipes[index].favorite = !recipes[index].favorite;
+            renderRecipes('recipe-grid', recipes);
+            renderRecipes('saved-recipes-grid', recipes);
+            renderRecipes('profile-recipes-grid', recipes.slice(0, 4));
+        }
+
+        // Handle ingredient add
+        function handleIngredientAdd(event) {
+            if (event.key === 'Enter' && event.target.value.trim()) {
+                const container = document.getElementById('ingredient-container');
+                const tag = document.createElement('div');
+                tag.className = 'ingredient-tag';
+                tag.innerHTML = `
+                    🥘 ${event.target.value}
+                    <button class="remove-tag" onclick="removeIngredient(this)">×</button>
+                `;
+                container.appendChild(tag);
+                event.target.value = '';
+            }
+        }
+
+        // Remove ingredient
+        function removeIngredient(button) {
+            button.parentElement.remove();
+        }
+
+        // Add suggestion
+        function addSuggestion(ingredient) {
+            const container = document.getElementById('ingredient-container');
+            const tag = document.createElement('div');
+            tag.className = 'ingredient-tag';
+            tag.innerHTML = `
+                🥘 ${ingredient}
+                <button class="remove-tag" onclick="removeIngredient(this)">×</button>
+            `;
+            container.appendChild(tag);
+        }
+
+        // Generate recipe
+        function generateRecipe() {
+            document.getElementById('loading').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('generated-recipe').style.display = 'block';
+                window.scrollTo({ top: document.getElementById('generated-recipe').offsetTop - 100, behavior: 'smooth' });
+            }, 2000);
+        }
+
+        // Handle login
+        function handleLogin(event) {
+            event.preventDefault();
+            document.getElementById('loading').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                showPage('search');
+            }, 1500);
+        }
+
+        // Handle register
+        function handleRegister(event) {
+            event.preventDefault();
+            document.getElementById('loading').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                showPage('login');
+            }, 1500);
+        }
+
+        // Save recipe
+        function saveRecipe() {
+            document.getElementById('loading').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                alert('Recipe saved successfully! 🎉');
+                showPage('my-recipes');
+            }, 2000);
+        }
+
+        // Logout
+        function logout() {
+            document.getElementById('loading').style.display = 'flex';
+            
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-nav').style.display = 'none';
+                showPage('login');
+            }, 1000);
+        }
+
+        // Smooth hover effects for recipe cards
+        document.addEventListener('mouseover', function(e) {
+            if (e.target.closest('.recipe-card')) {
+                e.target.closest('.recipe-card').style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            }
+        });
+
+        // Filter button interactions
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>group">
+                            <label>Recipe Title</label>
+                            <input type="text" placeholder="Enter recipe name">
+                        </div>
+                        <div class="form-
